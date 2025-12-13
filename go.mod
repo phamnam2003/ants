@@ -1,8 +1,9 @@
-module github.com/panjf2000/ants/v2
+module github.com/phamnam2003/ants
 
-go 1.18
+go 1.25.5
 
 require (
+	github.com/panjf2000/ants/v2 v2.11.3
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/sync v0.11.0
 )
