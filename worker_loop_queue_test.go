@@ -44,7 +44,7 @@ func TestLoopQueue(t *testing.T) {
 	size := 10
 	q := newWorkerLoopQueue(size)
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		err := q.insert(&goWorker{lastUsed: time.Now()})
 		if err != nil {
 			break
@@ -56,7 +56,7 @@ func TestLoopQueue(t *testing.T) {
 
 	time.Sleep(time.Second)
 
-	for i := 0; i < 6; i++ {
+	for range 6 {
 		err := q.insert(&goWorker{lastUsed: time.Now()})
 		if err != nil {
 			break
@@ -98,7 +98,7 @@ func TestRotatedQueueSearch(t *testing.T) {
 	require.EqualValues(t, 1, q.binarySearch(time.Now()), "index should be 1")
 
 	// more
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		_ = q.insert(&goWorker{lastUsed: time.Now()})
 	}
 
@@ -113,21 +113,21 @@ func TestRotatedQueueSearch(t *testing.T) {
 	require.EqualValues(t, 7, q.binarySearch(expiry3), "index should be 7")
 
 	// rotate
-	for i := 0; i < 6; i++ {
+	for range 6 {
 		_ = q.detach()
 	}
 
 	expiry4 := time.Now()
 	_ = q.insert(&goWorker{lastUsed: expiry4})
 
-	for i := 0; i < 4; i++ {
+	for range 4 {
 		_ = q.insert(&goWorker{lastUsed: time.Now()})
 	}
 	//	head = 6, tail = 5, insert direction ->
 	// [expiry4, time, time, time,  time, nil/tail,  time/head, time, time, time]
 	require.EqualValues(t, 0, q.binarySearch(expiry4), "index should be 0")
 
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		_ = q.detach()
 	}
 	expiry5 := time.Now()
@@ -137,7 +137,7 @@ func TestRotatedQueueSearch(t *testing.T) {
 	// [expiry4, time, time, time,  time, expiry5,  nil/tail, nil, nil, time/head]
 	require.EqualValues(t, 5, q.binarySearch(expiry5), "index should be 5")
 
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		_ = q.insert(&goWorker{lastUsed: time.Now()})
 	}
 	//	head = 9, tail = 9, insert direction ->
@@ -188,7 +188,7 @@ func TestRetrieveExpiry(t *testing.T) {
 	for i := 0; i < size/2; i++ {
 		_ = q.detach()
 	}
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		_ = q.insert(&goWorker{lastUsed: time.Now()})
 	}
 	time.Sleep(u)

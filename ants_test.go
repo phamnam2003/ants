@@ -58,7 +58,7 @@ func TestAntsPoolWaitToGetWorker(t *testing.T) {
 	p, _ := ants.NewPool(AntsSize)
 	defer p.Release()
 
-	for i := 0; i < n; i++ {
+	for range n {
 		wg.Add(1)
 		_ = p.Submit(func() {
 			demoPoolFunc(Param)
@@ -78,7 +78,7 @@ func TestAntsPoolWaitToGetWorkerPreMalloc(t *testing.T) {
 	p, _ := ants.NewPool(AntsSize, ants.WithPreAlloc(true))
 	defer p.Release()
 
-	for i := 0; i < n; i++ {
+	for range n {
 		wg.Add(1)
 		_ = p.Submit(func() {
 			demoPoolFunc(Param)
@@ -102,7 +102,7 @@ func TestAntsPoolWithFuncWaitToGetWorker(t *testing.T) {
 	})
 	defer p.Release()
 
-	for i := 0; i < n; i++ {
+	for range n {
 		wg.Add(1)
 		_ = p.Invoke(Param)
 	}
@@ -123,7 +123,7 @@ func TestAntsPoolWithFuncGenericWaitToGetWorker(t *testing.T) {
 	})
 	defer p.Release()
 
-	for i := 0; i < n; i++ {
+	for range n {
 		wg.Add(1)
 		_ = p.Invoke(Param)
 	}
@@ -143,7 +143,7 @@ func TestAntsPoolWithFuncWaitToGetWorkerPreMalloc(t *testing.T) {
 	}, ants.WithPreAlloc(true))
 	defer p.Release()
 
-	for i := 0; i < n; i++ {
+	for range n {
 		wg.Add(1)
 		_ = p.Invoke(Param)
 	}
@@ -163,7 +163,7 @@ func TestAntsPoolWithFuncGenericWaitToGetWorkerPreMalloc(t *testing.T) {
 	}, ants.WithPreAlloc(true))
 	defer p.Release()
 
-	for i := 0; i < n; i++ {
+	for range n {
 		wg.Add(1)
 		_ = p.Invoke(Param)
 	}
@@ -180,7 +180,7 @@ func TestAntsPoolGetWorkerFromCache(t *testing.T) {
 	p, _ := ants.NewPool(TestSize)
 	defer p.Release()
 
-	for i := 0; i < AntsSize; i++ {
+	for range AntsSize {
 		_ = p.Submit(demoFunc)
 	}
 	time.Sleep(2 * ants.DefaultCleanIntervalTime)
@@ -198,7 +198,7 @@ func TestAntsPoolWithFuncGetWorkerFromCache(t *testing.T) {
 	p, _ := ants.NewPoolWithFunc(TestSize, demoPoolFunc)
 	defer p.Release()
 
-	for i := 0; i < AntsSize; i++ {
+	for range AntsSize {
 		_ = p.Invoke(dur)
 	}
 	time.Sleep(2 * ants.DefaultCleanIntervalTime)
@@ -216,7 +216,7 @@ func TestAntsPoolWithFuncGenericGetWorkerFromCache(t *testing.T) {
 	p, _ := ants.NewPoolWithFuncGeneric(TestSize, demoPoolFuncInt)
 	defer p.Release()
 
-	for i := 0; i < AntsSize; i++ {
+	for range AntsSize {
 		_ = p.Invoke(dur)
 	}
 	time.Sleep(2 * ants.DefaultCleanIntervalTime)
@@ -233,7 +233,7 @@ func TestAntsPoolWithFuncGetWorkerFromCachePreMalloc(t *testing.T) {
 	p, _ := ants.NewPoolWithFunc(TestSize, demoPoolFunc, ants.WithPreAlloc(true))
 	defer p.Release()
 
-	for i := 0; i < AntsSize; i++ {
+	for range AntsSize {
 		_ = p.Invoke(dur)
 	}
 	time.Sleep(2 * ants.DefaultCleanIntervalTime)
@@ -250,7 +250,7 @@ func TestAntsPoolWithFuncGenericGetWorkerFromCachePreMalloc(t *testing.T) {
 	p, _ := ants.NewPoolWithFuncGeneric(TestSize, demoPoolFuncInt, ants.WithPreAlloc(true))
 	defer p.Release()
 
-	for i := 0; i < AntsSize; i++ {
+	for range AntsSize {
 		_ = p.Invoke(dur)
 	}
 	time.Sleep(2 * ants.DefaultCleanIntervalTime)
@@ -266,7 +266,7 @@ func TestAntsPoolWithFuncGenericGetWorkerFromCachePreMalloc(t *testing.T) {
 
 func TestNoPool(t *testing.T) {
 	var wg sync.WaitGroup
-	for i := 0; i < n; i++ {
+	for range n {
 		wg.Add(1)
 		go func() {
 			demoFunc()
@@ -284,7 +284,7 @@ func TestNoPool(t *testing.T) {
 func TestAntsPool(t *testing.T) {
 	defer ants.Release()
 	var wg sync.WaitGroup
-	for i := 0; i < n; i++ {
+	for range n {
 		wg.Add(1)
 		_ = ants.Submit(func() {
 			demoFunc()
@@ -805,7 +805,7 @@ func testPoolWithDisablePurge(t *testing.T, p *ants.Pool, numWorker int, waitFor
 	var wg1, wg2 sync.WaitGroup
 	wg1.Add(numWorker)
 	wg2.Add(numWorker)
-	for i := 0; i < numWorker; i++ {
+	for range numWorker {
 		_ = p.Submit(func() {
 			wg1.Done()
 			<-sig
@@ -853,7 +853,7 @@ func TestWithDisablePurgeAndWithExpirationPool(t *testing.T) {
 }
 
 func testPoolFuncWithDisablePurge(t *testing.T, p *ants.PoolWithFunc, numWorker int, wg1, wg2 *sync.WaitGroup, sig chan struct{}, waitForPurge time.Duration) {
-	for i := 0; i < numWorker; i++ {
+	for i := range numWorker {
 		_ = p.Invoke(i)
 	}
 	wg1.Wait()
@@ -1110,7 +1110,7 @@ func TestRestCodeCoverage(t *testing.T) {
 		_ = p0.Submit(demoFunc)
 	}()
 	defer p0.Release()
-	for i := 0; i < n; i++ {
+	for range n {
 		_ = p0.Submit(demoFunc)
 	}
 	t.Logf("pool, capacity:%d", p0.Cap())
@@ -1125,7 +1125,7 @@ func TestRestCodeCoverage(t *testing.T) {
 		_ = p1.Submit(demoFunc)
 	}()
 	defer p1.Release()
-	for i := 0; i < n; i++ {
+	for range n {
 		_ = p1.Submit(demoFunc)
 	}
 	t.Logf("pre-malloc pool, capacity:%d", p1.Cap())
@@ -1140,7 +1140,7 @@ func TestRestCodeCoverage(t *testing.T) {
 		_ = p2.Invoke(Param)
 	}()
 	defer p2.Release()
-	for i := 0; i < n; i++ {
+	for range n {
 		_ = p2.Invoke(Param)
 	}
 	time.Sleep(ants.DefaultCleanIntervalTime)
@@ -1156,7 +1156,7 @@ func TestRestCodeCoverage(t *testing.T) {
 		_ = p3.Invoke(Param)
 	}()
 	defer p3.Release()
-	for i := 0; i < n; i++ {
+	for range n {
 		_ = p3.Invoke(Param)
 	}
 	time.Sleep(ants.DefaultCleanIntervalTime)
@@ -1172,7 +1172,7 @@ func TestRestCodeCoverage(t *testing.T) {
 		_ = p4.Invoke(Param)
 	}()
 	defer p4.Release()
-	for i := 0; i < n; i++ {
+	for range n {
 		_ = p4.Invoke(Param)
 	}
 	time.Sleep(ants.DefaultCleanIntervalTime)
@@ -1189,7 +1189,7 @@ func TestRestCodeCoverage(t *testing.T) {
 		_ = p5.Invoke(Param)
 	}()
 	defer p5.Release()
-	for i := 0; i < n; i++ {
+	for range n {
 		_ = p5.Invoke(Param)
 	}
 	time.Sleep(ants.DefaultCleanIntervalTime)

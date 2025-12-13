@@ -73,7 +73,7 @@ func longRunningPoolFuncCh(ch chan struct{}) {
 
 func BenchmarkGoroutines(b *testing.B) {
 	var wg sync.WaitGroup
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		wg.Add(RunTimes)
 		for j := 0; j < RunTimes; j++ {
 			go func() {
@@ -90,7 +90,7 @@ func BenchmarkChannel(b *testing.B) {
 	sema := make(chan struct{}, PoolCap)
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		wg.Add(RunTimes)
 		for j := 0; j < RunTimes; j++ {
 			sema <- struct{}{}
@@ -110,7 +110,7 @@ func BenchmarkErrGroup(b *testing.B) {
 	pool.SetLimit(PoolCap)
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		wg.Add(RunTimes)
 		for j := 0; j < RunTimes; j++ {
 			pool.Go(func() error {
@@ -129,7 +129,7 @@ func BenchmarkAntsPool(b *testing.B) {
 	defer p.Release()
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		wg.Add(RunTimes)
 		for j := 0; j < RunTimes; j++ {
 			_ = p.Submit(func() {
@@ -147,7 +147,7 @@ func BenchmarkAntsMultiPool(b *testing.B) {
 	defer p.ReleaseTimeout(DefaultExpiredTime) //nolint:errcheck
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		wg.Add(RunTimes)
 		for j := 0; j < RunTimes; j++ {
 			_ = p.Submit(func() {
@@ -160,7 +160,7 @@ func BenchmarkAntsMultiPool(b *testing.B) {
 }
 
 func BenchmarkGoroutinesThroughput(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for j := 0; j < RunTimes; j++ {
 			go demoFunc()
 		}
@@ -169,7 +169,7 @@ func BenchmarkGoroutinesThroughput(b *testing.B) {
 
 func BenchmarkSemaphoreThroughput(b *testing.B) {
 	sema := make(chan struct{}, PoolCap)
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for j := 0; j < RunTimes; j++ {
 			sema <- struct{}{}
 			go func() {
@@ -185,7 +185,7 @@ func BenchmarkAntsPoolThroughput(b *testing.B) {
 	defer p.Release()
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for j := 0; j < RunTimes; j++ {
 			_ = p.Submit(demoFunc)
 		}
@@ -197,7 +197,7 @@ func BenchmarkAntsMultiPoolThroughput(b *testing.B) {
 	defer p.ReleaseTimeout(DefaultExpiredTime) //nolint:errcheck
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for j := 0; j < RunTimes; j++ {
 			_ = p.Submit(demoFunc)
 		}

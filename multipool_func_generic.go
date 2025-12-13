@@ -53,7 +53,7 @@ func NewMultiPoolWithFuncGeneric[T any](size, sizePerPool int, fn func(T), lbs L
 		return nil, ErrInvalidLoadBalancingStrategy
 	}
 	pools := make([]*PoolWithFuncGeneric[T], size)
-	for i := 0; i < size; i++ {
+	for i := range size {
 		pool, err := NewPoolWithFuncGeneric(sizePerPool, fn, options...)
 		if err != nil {
 			return nil, err

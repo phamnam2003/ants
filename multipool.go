@@ -68,7 +68,7 @@ func NewMultiPool(size, sizePerPool int, lbs LoadBalancingStrategy, options ...O
 		return nil, ErrInvalidLoadBalancingStrategy
 	}
 	pools := make([]*Pool, size)
-	for i := 0; i < size; i++ {
+	for i := range size {
 		pool, err := NewPool(sizePerPool, options...)
 		if err != nil {
 			return nil, err

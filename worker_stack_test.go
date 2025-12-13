@@ -97,7 +97,7 @@ func TestSearch(t *testing.T) {
 	require.EqualValues(t, 1, q.binarySearch(0, q.len()-1, time.Now()), "index should be 1")
 
 	// more
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		_ = q.insert(&goWorker{lastUsed: time.Now()})
 	}
 
@@ -105,7 +105,7 @@ func TestSearch(t *testing.T) {
 
 	_ = q.insert(&goWorker{lastUsed: expiry3})
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		_ = q.insert(&goWorker{lastUsed: time.Now()})
 	}
 

@@ -53,7 +53,7 @@ func ExamplePool() {
 	runTimes := 1000
 	wg.Add(runTimes)
 	// Use the default pool.
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		j := i
 		_ = ants.Submit(func() {
 			incSumInt(int32(j))
@@ -67,7 +67,7 @@ func ExamplePool() {
 	// Use the new pool.
 	pool, _ := ants.NewPool(10)
 	defer pool.Release()
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		j := i
 		_ = pool.Submit(func() {
 			incSumInt(int32(j))
@@ -89,7 +89,7 @@ func ExamplePoolWithFunc() {
 	pool, _ := ants.NewPoolWithFunc(10, incSum)
 	defer pool.Release()
 
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		_ = pool.Invoke(int32(i))
 	}
 	wg.Wait()
