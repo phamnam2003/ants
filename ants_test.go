@@ -59,10 +59,10 @@ func TestAntsPoolWaitToGetWorker(t *testing.T) {
 	defer p.Release()
 
 	for range n {
-		wg.Add(1)
-		_ = p.Submit(func() {
-			demoPoolFunc(Param)
-			wg.Done()
+		wg.Go(func() {
+			_ = p.Submit(func() {
+				demoPoolFunc(Param)
+			})
 		})
 	}
 	wg.Wait()
@@ -79,10 +79,10 @@ func TestAntsPoolWaitToGetWorkerPreMalloc(t *testing.T) {
 	defer p.Release()
 
 	for range n {
-		wg.Add(1)
-		_ = p.Submit(func() {
-			demoPoolFunc(Param)
-			wg.Done()
+		wg.Go(func() {
+			_ = p.Submit(func() {
+				demoPoolFunc(Param)
+			})
 		})
 	}
 	wg.Wait()
@@ -267,11 +267,7 @@ func TestAntsPoolWithFuncGenericGetWorkerFromCachePreMalloc(t *testing.T) {
 func TestNoPool(t *testing.T) {
 	var wg sync.WaitGroup
 	for range n {
-		wg.Add(1)
-		go func() {
-			demoFunc()
-			wg.Done()
-		}()
+		wg.Go(demoFunc)
 	}
 
 	wg.Wait()
@@ -445,7 +441,7 @@ func TestPurgePool(t *testing.T) {
 	require.NoErrorf(t, err, "create TimingPool failed: %v", err)
 	defer p.Release()
 
-	for i := 0; i < size; i++ {
+	for i := range size {
 		j := i + 1
 		_ = p.Submit(func() {
 			<-ch
@@ -470,7 +466,7 @@ func TestPurgePool(t *testing.T) {
 	require.NoErrorf(t, err, "create TimingPoolWithFunc failed: %v", err)
 	defer p1.Release()
 
-	for i := 0; i < size; i++ {
+	for i := range size {
 		_ = p1.Invoke(i)
 	}
 	require.EqualValuesf(t, size, p1.Running(), "pool should be full, expected: %d, but got: %d", size, p1.Running())
@@ -490,7 +486,7 @@ func TestPurgePool(t *testing.T) {
 	require.NoErrorf(t, err, "create TimingPoolWithFunc failed: %v", err)
 	defer p2.Release()
 
-	for i := 0; i < size; i++ {
+	for i := range size {
 		_ = p2.Invoke(i)
 	}
 	require.EqualValuesf(t, size, p2.Running(), "pool should be full, expected: %d, but got: %d", size, p2.Running())
@@ -975,7 +971,7 @@ func TestReleaseWhenRunningPool(t *testing.T) {
 			wg.Done()
 			t.Log("stop aaa")
 		}()
-		for i := 0; i < 30; i++ {
+		for i := range 30 {
 			j := i
 			_ = p.Submit(func() {
 				t.Log("do task", j)
@@ -1020,7 +1016,7 @@ func TestReleaseWhenRunningPoolWithFunc(t *testing.T) {
 			wg.Done()
 			t.Log("stop aaa")
 		}()
-		for i := 0; i < 30; i++ {
+		for i := range 30 {
 			_ = p.Invoke(i)
 		}
 	}()
@@ -1057,7 +1053,7 @@ func TestReleaseWhenRunningPoolWithFuncGeneric(t *testing.T) {
 			wg.Done()
 			t.Log("stop aaa")
 		}()
-		for i := 0; i < 30; i++ {
+		for i := range 30 {
 			_ = p.Invoke(i)
 		}
 	}()
@@ -1206,7 +1202,7 @@ func TestPoolTuneScaleUp(t *testing.T) {
 	c := make(chan struct{})
 	// Test Pool
 	p, _ := ants.NewPool(2)
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		_ = p.Submit(func() {
 			<-c
 		})
@@ -1222,20 +1218,18 @@ func TestPoolTuneScaleUp(t *testing.T) {
 	require.EqualValuesf(t, 3, n, "expect 3 workers running, but got %d", n)
 	// test pool tune scale up multiple
 	var wg sync.WaitGroup
-	for i := 0; i < 5; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range 5 {
+		wg.Go(func() {
 			_ = p.Submit(func() {
 				<-c
 			})
-		}()
+		})
 	}
 	p.Tune(8)
 	wg.Wait()
 	n = p.Running()
 	require.EqualValuesf(t, 8, n, "expect 8 workers running, but got %d", n)
-	for i := 0; i < 8; i++ {
+	for range 8 {
 		c <- struct{}{}
 	}
 	p.Release()
@@ -1244,7 +1238,7 @@ func TestPoolTuneScaleUp(t *testing.T) {
 	pf, _ := ants.NewPoolWithFunc(2, func(_ any) {
 		<-c
 	})
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		_ = pf.Invoke(1)
 	}
 	n = pf.Running()
@@ -1255,18 +1249,16 @@ func TestPoolTuneScaleUp(t *testing.T) {
 	n = pf.Running()
 	require.EqualValuesf(t, 3, n, "expect 3 workers running, but got %d", n)
 	// test pool tune scale up multiple
-	for i := 0; i < 5; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range 5 {
+		wg.Go(func() {
 			_ = pf.Invoke(1)
-		}()
+		})
 	}
 	pf.Tune(8)
 	wg.Wait()
 	n = pf.Running()
 	require.EqualValuesf(t, 8, n, "expect 8 workers running, but got %d", n)
-	for i := 0; i < 8; i++ {
+	for range 8 {
 		c <- struct{}{}
 	}
 	pf.Release()
@@ -1275,7 +1267,7 @@ func TestPoolTuneScaleUp(t *testing.T) {
 	pfg, _ := ants.NewPoolWithFuncGeneric(2, func(_ int) {
 		<-c
 	})
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		_ = pfg.Invoke(1)
 	}
 	n = pfg.Running()
@@ -1286,18 +1278,16 @@ func TestPoolTuneScaleUp(t *testing.T) {
 	n = pfg.Running()
 	require.EqualValuesf(t, 3, n, "expect 3 workers running, but got %d", n)
 	// test pool tune scale up multiple
-	for i := 0; i < 5; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range 5 {
+		wg.Go(func() {
 			_ = pfg.Invoke(1)
-		}()
+		})
 	}
 	pfg.Tune(8)
 	wg.Wait()
 	n = pfg.Running()
 	require.EqualValuesf(t, 8, n, "expect 8 workers running, but got %d", n)
-	for i := 0; i < 8; i++ {
+	for range 8 {
 		c <- struct{}{}
 	}
 	close(c)
@@ -1307,7 +1297,7 @@ func TestPoolTuneScaleUp(t *testing.T) {
 func TestReleaseTimeout(t *testing.T) {
 	p, err := ants.NewPool(10)
 	require.NoError(t, err)
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		_ = p.Submit(func() {
 			time.Sleep(time.Second)
 		})
@@ -1321,7 +1311,7 @@ func TestReleaseTimeout(t *testing.T) {
 		time.Sleep(dur)
 	})
 	require.NoError(t, err)
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		_ = pf.Invoke(time.Second)
 	}
 	require.NotZero(t, pf.Running())
@@ -1332,7 +1322,7 @@ func TestReleaseTimeout(t *testing.T) {
 		time.Sleep(d)
 	})
 	require.NoError(t, err)
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		_ = pfg.Invoke(time.Second)
 	}
 	require.NotZero(t, pfg.Running())
@@ -1342,7 +1332,7 @@ func TestReleaseTimeout(t *testing.T) {
 
 func TestDefaultPoolReleaseTimeout(t *testing.T) {
 	ants.Reboot() // should do nothing inside
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		_ = ants.Submit(func() {
 			time.Sleep(time.Second)
 		})
@@ -1362,7 +1352,7 @@ func TestMultiPool(t *testing.T) {
 
 	mp, err := ants.NewMultiPool(10, 5, ants.RoundRobin)
 	testFn := func() {
-		for i := 0; i < 50; i++ {
+		for range 50 {
 			err = mp.Submit(longRunningFunc)
 			require.NoError(t, err)
 		}
@@ -1383,7 +1373,7 @@ func TestMultiPool(t *testing.T) {
 		require.ErrorIs(t, err, ants.ErrInvalidPoolIndex)
 		require.EqualValues(t, 50, mp.Cap())
 		require.False(t, mp.IsClosed())
-		for i := 0; i < 10; i++ {
+		for i := range 10 {
 			n, _ := mp.WaitingByIndex(i)
 			require.EqualValues(t, 0, n)
 			n, _ = mp.RunningByIndex(i)
@@ -1424,7 +1414,7 @@ func TestMultiPoolWithFunc(t *testing.T) {
 	ch := make(chan struct{})
 	mp, err := ants.NewMultiPoolWithFunc(10, 5, longRunningPoolFunc, ants.RoundRobin)
 	testFn := func() {
-		for i := 0; i < 50; i++ {
+		for range 50 {
 			err = mp.Invoke(ch)
 			require.NoError(t, err)
 		}
@@ -1445,7 +1435,7 @@ func TestMultiPoolWithFunc(t *testing.T) {
 		require.ErrorIs(t, err, ants.ErrInvalidPoolIndex)
 		require.EqualValues(t, 50, mp.Cap())
 		require.False(t, mp.IsClosed())
-		for i := 0; i < 10; i++ {
+		for i := range 10 {
 			n, _ := mp.WaitingByIndex(i)
 			require.EqualValues(t, 0, n)
 			n, _ = mp.RunningByIndex(i)
@@ -1486,7 +1476,7 @@ func TestMultiPoolWithFuncGeneric(t *testing.T) {
 	ch := make(chan struct{})
 	mp, err := ants.NewMultiPoolWithFuncGeneric(10, 5, longRunningPoolFuncCh, ants.RoundRobin)
 	testFn := func() {
-		for i := 0; i < 50; i++ {
+		for range 50 {
 			err = mp.Invoke(ch)
 			require.NoError(t, err)
 		}
@@ -1507,7 +1497,7 @@ func TestMultiPoolWithFuncGeneric(t *testing.T) {
 		require.ErrorIs(t, err, ants.ErrInvalidPoolIndex)
 		require.EqualValues(t, 50, mp.Cap())
 		require.False(t, mp.IsClosed())
-		for i := 0; i < 10; i++ {
+		for i := range 10 {
 			n, _ := mp.WaitingByIndex(i)
 			require.EqualValues(t, 0, n)
 			n, _ = mp.RunningByIndex(i)
@@ -1546,7 +1536,7 @@ func TestRebootNewPoolCalc(t *testing.T) {
 	require.NoError(t, err)
 	defer pool.Release()
 	// Use the default pool.
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		j := i
 		_ = pool.Submit(func() {
 			incSumInt(int32(j))
@@ -1561,7 +1551,7 @@ func TestRebootNewPoolCalc(t *testing.T) {
 	require.NoError(t, err)
 	pool.Reboot()
 
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		j := i
 		_ = pool.Submit(func() {
 			incSumInt(int32(j))
@@ -1580,7 +1570,7 @@ func TestRebootNewPoolWithPreAllocCalc(t *testing.T) {
 	require.NoError(t, err)
 	defer pool.Release()
 	// Use the default pool.
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		j := i
 		_ = pool.Submit(func() {
 			incSumInt(int32(j))
@@ -1595,7 +1585,7 @@ func TestRebootNewPoolWithPreAllocCalc(t *testing.T) {
 	pool.Reboot()
 
 	wg.Add(runTimes)
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		j := i
 		_ = pool.Submit(func() {
 			incSumInt(int32(j))
