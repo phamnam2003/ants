@@ -10,10 +10,12 @@ import (
 	"sync/atomic"
 )
 
+// spinLock represents a simple Locker implementation.
 type spinLock uint32
 
 const maxBackoff = 16
 
+// Lock acquires the spin-lock.
 func (sl *spinLock) Lock() {
 	backoff := 1
 	for !atomic.CompareAndSwapUint32((*uint32)(sl), 0, 1) {
@@ -27,6 +29,7 @@ func (sl *spinLock) Lock() {
 	}
 }
 
+// UnLock releases the spin-lock.
 func (sl *spinLock) Unlock() {
 	atomic.StoreUint32((*uint32)(sl), 0)
 }

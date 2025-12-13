@@ -41,7 +41,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	syncx "github.com/panjf2000/ants/v2/pkg/sync"
+	syncx "github.com/phamnam2003/ants/pkg/sync"
 )
 
 const (
