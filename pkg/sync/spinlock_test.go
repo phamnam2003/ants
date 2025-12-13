@@ -13,12 +13,13 @@ import (
 
 /*
 Benchmark result for three types of locks:
-	goos: darwin
-	goarch: arm64
+	goos: linux
+	goarch: amd64
 	pkg: github.com/phamnam2003/ants/pkg/sync
-	BenchmarkMutex-10              	10452573	       111.1 ns/op	       0 B/op	       0 allocs/op
-	BenchmarkSpinLock-10           	58953211	        18.01 ns/op	       0 B/op	       0 allocs/op
-	BenchmarkBackOffSpinLock-10    	100000000	        10.81 ns/op	       0 B/op	       0 allocs/op
+	cpu: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
+	BenchmarkMutex-8             	21508472	        55.51 ns/op	       0 B/op	       0 allocs/op
+	BenchmarkSpinLock-8          	59300019	        20.37 ns/op	       0 B/op	       0 allocs/op
+	BenchmarkBackOffSpinLock-8   	69218594	        17.38 ns/op	       0 B/op	       0 allocs/op
 */
 
 type originSpinLock uint32
