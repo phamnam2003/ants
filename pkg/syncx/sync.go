@@ -20,6 +20,6 @@
  * SOFTWARE.
  */
 
-// Package sync provides some handy implementations for synchronization access.
+// Package syncx provides some handy implementations for synchronization access.
 // At the moment, there is only an implementation of spin-lock.
-package sync
+package syncx
