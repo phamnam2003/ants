@@ -107,7 +107,7 @@ func ExamplePoolWithFuncGeneric() {
 	pool, _ := ants.NewPoolWithFuncGeneric(10, incSumInt)
 	defer pool.Release()
 
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		_ = pool.Invoke(int32(i))
 	}
 	wg.Wait()
@@ -125,7 +125,7 @@ func ExampleMultiPool() {
 	mp, _ := ants.NewMultiPool(10, runTimes/10, ants.RoundRobin)
 	defer mp.ReleaseTimeout(time.Second) // nolint:errcheck
 
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		j := i
 		_ = mp.Submit(func() {
 			incSumInt(int32(j))
@@ -146,7 +146,7 @@ func ExampleMultiPoolWithFunc() {
 	mp, _ := ants.NewMultiPoolWithFunc(10, runTimes/10, incSum, ants.RoundRobin)
 	defer mp.ReleaseTimeout(time.Second) // nolint:errcheck
 
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		_ = mp.Invoke(int32(i))
 	}
 	wg.Wait()
@@ -164,7 +164,7 @@ func ExampleMultiPoolWithFuncGeneric() {
 	mp, _ := ants.NewMultiPoolWithFuncGeneric(10, runTimes/10, incSumInt, ants.RoundRobin)
 	defer mp.ReleaseTimeout(time.Second) // nolint:errcheck
 
-	for i := 0; i < runTimes; i++ {
+	for i := range runTimes {
 		_ = mp.Invoke(int32(i))
 	}
 	wg.Wait()
