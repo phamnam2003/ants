@@ -153,13 +153,10 @@ type Logger interface {
 
 // poolCommon contains all common fields for other sophisticated pools.
 type poolCommon struct {
-	// capacity of the pool, a negative value means that the capacity of pool is limitless, an infinite pool is used to
-	// avoid potential issue of endless blocking caused by nested usage of a pool: submitting a task to pool
-	// which submits a new task to the same pool.
-	capacity int32
+	// workerCache speeds up the obtainment of a usable worker in function:retrieveWorker.
+	workerCache sync.Pool
 
-	// running is the number of the currently running goroutines.
-	running int32
+	now atomic.Value
 
 	// lock for protecting the worker queue.
 	lock sync.Locker
@@ -167,34 +164,40 @@ type poolCommon struct {
 	// workers is a slice that store the available workers.
 	workers workerQueue
 
-	// state is used to notice the pool to closed itself.
-	state int32
+	ticktockCtx context.Context
+	purgeCtx    context.Context
+	stopPurge   context.CancelFunc
+
+	// once is used to make sure the pool is closed just once.
+	once *sync.Once
+
+	// done is used to indicate that all workers are done.
+	allDone chan struct{}
 
 	// cond for waiting to get an idle worker.
 	cond *sync.Cond
 
-	// done is used to indicate that all workers are done.
-	allDone chan struct{}
-	// once is used to make sure the pool is closed just once.
-	once *sync.Once
+	stopTicktock context.CancelFunc
 
-	// workerCache speeds up the obtainment of a usable worker in function:retrieveWorker.
-	workerCache sync.Pool
+	options *Options
 
 	// waiting is the number of goroutines already been blocked on pool.Submit(), protected by pool.lock
 	waiting int32
 
 	purgeDone int32
-	purgeCtx  context.Context
-	stopPurge context.CancelFunc
+
+	// capacity of the pool, a negative value means that the capacity of pool is limitless, an infinite pool is used to
+	// avoid potential issue of endless blocking caused by nested usage of a pool: submitting a task to pool
+	// which submits a new task to the same pool.
+	capacity int32
 
 	ticktockDone int32
-	ticktockCtx  context.Context
-	stopTicktock context.CancelFunc
 
-	now atomic.Value
+	// state is used to notice the pool to closed itself.
+	state int32
 
-	options *Options
+	// running is the number of the currently running goroutines.
+	running int32
 }
 
 func newPool(size int, options ...Option) (*poolCommon, error) {
