@@ -38,22 +38,9 @@ func loadOptions(options ...Option) *Options {
 
 // Options contains all options which will be applied when instantiating an ants pool.
 type Options struct {
-	// ExpiryDuration is a period for the scavenger goroutine to clean up those expired workers,
-	// the scavenger scans all workers every `ExpiryDuration` and clean up those workers that haven't been
-	// used for more than `ExpiryDuration`.
-	ExpiryDuration time.Duration
-
-	// PreAlloc indicates whether to make memory pre-allocation when initializing Pool.
-	PreAlloc bool
-
-	// Max number of goroutine blocking on pool.Submit.
-	// 0 (default value) means no such limit.
-	MaxBlockingTasks int
-
-	// When Nonblocking is true, Pool.Submit will never be blocked.
-	// ErrPoolOverload will be returned when Pool.Submit cannot be done at once.
-	// When Nonblocking is true, MaxBlockingTasks is inoperative.
-	Nonblocking bool
+	// Logger is the customized logger for logging info, if it is not set,
+	// default standard logger from log package is used.
+	Logger Logger
 
 	// PanicHandler is used to handle panics from each worker goroutine.
 	// If nil, the default behavior is to capture the value given to panic
@@ -61,9 +48,22 @@ type Options struct {
 	// stack trace of the goroutine
 	PanicHandler func(any)
 
-	// Logger is the customized logger for logging info, if it is not set,
-	// default standard logger from log package is used.
-	Logger Logger
+	// ExpiryDuration is a period for the scavenger goroutine to clean up those expired workers,
+	// the scavenger scans all workers every `ExpiryDuration` and clean up those workers that haven't been
+	// used for more than `ExpiryDuration`.
+	ExpiryDuration time.Duration
+
+	// Max number of goroutine blocking on pool.Submit.
+	// 0 (default value) means no such limit.
+	MaxBlockingTasks int
+
+	// PreAlloc indicates whether to make memory pre-allocation when initializing Pool.
+	PreAlloc bool
+
+	// When Nonblocking is true, Pool.Submit will never be blocked.
+	// ErrPoolOverload will be returned when Pool.Submit cannot be done at once.
+	// When Nonblocking is true, MaxBlockingTasks is inoperative.
+	Nonblocking bool
 
 	// When DisablePurge is true, workers are not purged and are resident.
 	DisablePurge bool
