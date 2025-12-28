@@ -1,4 +1,4 @@
-module github.com/phamnam2003/ants
+module github.com/phamnam2003/ants/v2
 
 go 1.25.5
 

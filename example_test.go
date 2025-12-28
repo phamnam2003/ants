@@ -29,7 +29,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/phamnam2003/ants"
+	"github.com/phamnam2003/ants/v2"
 )
 
 var (

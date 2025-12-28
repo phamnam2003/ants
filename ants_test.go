@@ -34,7 +34,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/phamnam2003/ants"
+	"github.com/phamnam2003/ants/v2"
 )
 
 const (

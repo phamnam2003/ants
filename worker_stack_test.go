@@ -41,7 +41,7 @@ func TestNewWorkerStack(t *testing.T) {
 func TestWorkerStack(t *testing.T) {
 	q := newWorkerQueue(queueType(-1), 0)
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		err := q.insert(&goWorker{lastUsed: time.Now()})
 		if err != nil {
 			break
@@ -58,7 +58,7 @@ func TestWorkerStack(t *testing.T) {
 
 	time.Sleep(time.Second)
 
-	for i := 0; i < 6; i++ {
+	for range 6 {
 		err := q.insert(&goWorker{lastUsed: time.Now()})
 		if err != nil {
 			t.Fatal("Enqueue error")
