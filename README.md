@@ -60,7 +60,7 @@ This fork includes significant modifications and refactoring.
 ## 🧰 How to install
 
 ```powershell
-go get -u github.com/phamnam2003/ants
+go get -u github.com/phamnam2003/ants/v2
 ```
 
 ## 🛠 How to use
@@ -131,14 +131,6 @@ pool.Reboot()
 ## ⚙️ About sequence
 
 All tasks submitted to `ants` pool will not be guaranteed to be addressed in order, because those tasks scatter among a series of concurrent workers, thus those tasks would be executed concurrently.
-
-## 👏 Contributors
-
-Please read our [Contributing Guidelines](CONTRIBUTING.md) before opening a PR and thank you to all the developers who already made contributions to `ants`!
-
-<a href="https://github.com/panjf2000/ants/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=panjf2000/ants" />
-</a>
 
 ## 📄 License
 
